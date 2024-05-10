@@ -1,0 +1,14 @@
+diff --git oci/private/image.bzl oci/private/image.bzl
+index 93a6668..bca45a6 100644
+--- oci/private/image.bzl
++++ oci/private/image.bzl
+@@ -175,8 +175,7 @@ def _oci_image_impl(ctx):
+     # If tree artifact symlinks are supported just add tars into runfiles.
+     if use_symlinks:
+         transitive_inputs = transitive_inputs + ctx.files.tars
+-    else:
+-        inputs = inputs + ctx.files.tars
++    inputs = inputs + ctx.files.tars
+ 
+     # add layers
+     for (i, layer) in enumerate(ctx.files.tars):

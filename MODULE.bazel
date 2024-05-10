@@ -1,0 +1,36 @@
+module(name = "rules_oci_repro")
+
+http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+bazel_dep(name = "rules_oci", version = "0.0.0")
+
+git_override(
+    module_name = "rules_oci",
+    remote = "https://github.com/bazel-contrib/rules_oci",
+    commit = "cbff1544b352d2ef3c4b46ae2df98a4276ebf423",
+    # patches = [":rules_oci.patch"],
+)
+
+oci = use_extension("@rules_oci//oci:extensions.bzl", "oci")
+oci.pull(
+    name = "ubuntu",
+    image = "ubuntu",
+    digest = "sha256:2af372c1e2645779643284c7dc38775e3dbbc417b2d784a27c5a9eb784014fb8", # 22.04
+    platforms = ["linux/amd64"],
+)
+use_repo(oci, "ubuntu")
+
+http_archive(
+    name = "git",
+    url = "http://archive.ubuntu.com/ubuntu/pool/main/g/git/git_2.34.1-1ubuntu1.9_amd64.deb",
+    sha256 = "013b938e5ad507578035b5b51adef3879dfb07fe39353329fb07bb0899823c91",
+    build_file_content = """
+genrule(
+    name = "data",
+    srcs = ["data.tar.zst"],
+    outs = ["data.tar"],
+    cmd = "zstd -df -o $@ $<",
+    visibility = ["//visibility:public"],
+)
+"""
+)
